@@ -74,3 +74,73 @@ end
 using Plots 
 plot(losses)
 savefig("plots/loss.png")
+
+
+#--------------------------------------------------#
+#------------For Ternary classification------------#
+#--------------------------------------------------#
+
+Y = Matrix{Float64}(undef, nrow(iris),3)
+for (i,species) in enumerate(iris.Species)
+	if species == "setosa"
+		Y[i,:] = [1. , 0. , 0. ]
+	elseif species == "versicolor"
+		Y[i,:] = [0. , 1. , 0. ]
+	elseif species == "virginica"
+		Y[i,:] = [0. , 0. , 1. ]
+	else 
+		println("Could not classify $i")
+	end
+end
+# We need the softmax as the replacement for the sigmoid for three-classification
+function softmax(Z)
+	Z = Z .- maximum(Z,dims=2)
+	expZ = exp.(Z)
+	return expZ ./ sum(expZ,dims=2)
+end 
+#predict now depends on the softmax function
+
+
+function predict(X::Matrix,W::Matrix,b)
+	Z = X*W .+b 
+	return softmax(Z)
+end
+#categorical_cross_entropy replaces binary_cross_entropy where one-hot encoding filters, the clamp prevents inf, sum across rows to return loss 
+function categorical_cross_entropy(Ȳ , Y)
+	ϵ = 1e-15 
+	Ȳ = clamp.(Ȳ,ϵ,1-ϵ)
+
+	return -mean(sum( Y .* log.(Ȳ),dims=2 ))
+end 
+function gradient(difference::Matrix,X::Matrix )
+	n = size(X,1)
+
+	dW = X' * difference/n 
+	dB = vec(mean(difference,dims=1)) 
+	return dW,dB 
+end
+
+B_i = randn(1,3) 
+Ȳ_i = predict(X,W_i,B_i )
+L_i = categorical_cross_entropy(Ȳ_i , Y )
+W,B = W_i,B_i 
+losses = []
+η = 0.001 
+
+
+
+
+for epoch in 1:2000
+	Ŷ = predict(X,W_i,B_i )
+	loss = categorical_cross_entropy(Ŷ,Y)
+	push!(losses,loss)
+	 
+	diff = Ŷ .- Y
+	dW,dB = gradient(diff,X)
+	W .-= (η.*dW)
+	B .-= (η.*dB)
+	if epoch % 100 == 0 
+		println("Epoch $epoch: loss is $loss")
+	end
+end
+

@@ -18,6 +18,8 @@ The aim is to demonstrate familiarity with the machine learning workflow while g
 ## Linear Regression
 
 Implement a basic regression model to predict continuous values from small datasets.
+This was performed on the Boston Housing data for linear regression, as well as the iris dataset for sigmoid regression/binary predictor. 
+
 
 ## Image Classification
 
