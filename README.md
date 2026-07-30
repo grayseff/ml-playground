@@ -1,7 +1,7 @@
 
 # Machine Learning Playground
 
-This repository demonstrates the practical application of machine learning in Julia using the Flux ecosystem. While I used machine learning potentials during my computational physics thesis and have a strong understanding of the underlying mathematics, this project focuses on implementing, training, and evaluating machine learning models directly.
+This repository demonstrates the practical application of machine learning in Julia using the Flux ecosystem. While I used machine learning potentials during my computational physics thesis and have a strong understanding of the underlying mathematics, this project focuses on implementing, training, and evaluating machine learning models directly in Julia, rather than using the FORTRAN implementation of RuNNer.
 
 The aim is to demonstrate familiarity with the machine learning workflow while gaining hands-on experience with Julia's ML tooling.
 
