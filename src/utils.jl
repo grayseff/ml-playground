@@ -77,4 +77,42 @@ function binary_cross_entropy(ŷ, y)
         (1 .- y) .* log.(1 .- ŷ)
     )
 end
+"""
+    sigmoid(Z::Matrix)
+
+Apply the sigmoid activation function elementwise.
+"""
+function sigmoid(Z::Matrix)
+    return 1.0 ./ (1.0 .+ exp.(-Z))
+end
+
+
+"""
+    softmax(Z::Matrix)
+
+Apply the softmax activation function to each row of `Z`.
+
+Each row is treated as a separate sample. The row maximum is
+subtracted before exponentiation to improve numerical stability.
+"""
+function softmax(Z::Matrix)
+    Z = Z .- maximum(Z, dims=2)
+    expZ = exp.(Z)
+
+    return expZ ./ sum(expZ, dims=2)
+end
+
+
+"""
+    categorical_cross_entropy(Ŷ::Matrix, Y::Matrix)
+
+Compute the mean categorical cross-entropy loss between the
+predicted probabilities `Ŷ` and the one-hot encoded labels `Y`.
+"""
+function categorical_cross_entropy(Ŷ::Matrix, Y::Matrix)
+    ϵ = 1e-15
+    Ŷ = clamp.(Ŷ, ϵ, 1 - ϵ)
+
+    return -mean(sum(Y .* log.(Ŷ), dims=2))
+end
 end

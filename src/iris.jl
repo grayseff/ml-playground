@@ -116,31 +116,33 @@ function gradient(difference::Matrix,X::Matrix )
 	n = size(X,1)
 
 	dW = X' * difference/n 
-	dB = vec(mean(difference,dims=1)) 
+	dB = mean(difference,dims=1)
 	return dW,dB 
 end
-
+W_i = randn(4,3)
 B_i = randn(1,3) 
 Ȳ_i = predict(X,W_i,B_i )
 L_i = categorical_cross_entropy(Ȳ_i , Y )
 W,B = W_i,B_i 
 losses = []
-η = 0.001 
+η = 0.01 
 
 
 
 
-for epoch in 1:2000
-	Ŷ = predict(X,W_i,B_i )
+for epoch in 1:5000
+	Ŷ = predict(X,W,B )
 	loss = categorical_cross_entropy(Ŷ,Y)
 	push!(losses,loss)
-	 
+	pred = argmax.(eachrow(Ŷ))
+	truth = argmax.(eachrow(Y))
+	accuracy = mean(pred .== truth)
 	diff = Ŷ .- Y
 	dW,dB = gradient(diff,X)
 	W .-= (η.*dW)
 	B .-= (η.*dB)
 	if epoch % 100 == 0 
-		println("Epoch $epoch: loss is $loss")
+		println("Epoch $epoch: loss is $loss accuracy is $accuracy")
 	end
 end
 
