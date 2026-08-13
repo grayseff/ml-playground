@@ -1,6 +1,6 @@
-using MLDatasets, Statistics,  Random, LinearAlgebra, Flux
-# include("utils.jl")
-# using .MLUtils
+using MLDatasets, Statistics,  Random, LinearAlgebra, Flux, AMDGPU
+ # include("src/utils.jl")
+ # using .MLUtils
 #instantiate the dataset
 mnist_train = MNIST(split=:train)
 mnist_test = MNIST(split=:test)
@@ -34,14 +34,25 @@ y_test = Flux.onehotbatch(y_test, 0:9)
 #----------------------------------#
 #----- Training the model ---------#
 #----------------------------------#
+# Send to GPU #
+# ----------------------------------#
+ 
+X_train = ROCArray(X_train)
+X_test = ROCArray(X_test)
+y_train = ROCArray(y_train)
+y_test = ROCArray(y_test)
+
+model = model |> gpu
+
+
 opt = Flux.setup(Flux.Adam(), model)
+#-----------------------------------#
+
 
 train_loader = Flux.DataLoader((X_train, y_train), batchsize=68, shuffle=true)
 test_loader = Flux.DataLoader((X_test, y_test), batchsize=68, shuffle=true)
 for epoch in 1:5
-    for (x, y) in train_loader
-        Flux.train!(loss, model, train_loader, opt)
-    end
+	Flux.train!(loss, model, train_loader, opt)
     println("Epoch $epoch, loss: $(round(loss(model,X_test, y_test), digits=4))")
     ȳ = model(X_test)
     predictions = Flux.onecold(ȳ, 0:9)
